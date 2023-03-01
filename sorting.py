@@ -10,7 +10,8 @@ if cmp(a, b) returns  1, then a > b;
 if cmp(a, b) returns  0, then a == b.
 '''
 
-import random
+# import random
+
 
 def cmp_standard(a, b):
     '''
@@ -78,6 +79,26 @@ def _merged(xs, ys, cmp=cmp_standard):
     [1, 2, 3, 4, 5, 6]
     '''
 
+    ixs = 0
+    iys = 0
+    ret = []
+    while ixs < len(xs) and iys < len(ys):
+        if cmp(xs[ixs], ys[iys]) == -1:
+            ret.append(xs[ixs])
+            ixs += 1
+        else:
+            ret.append(ys[iys])
+            iys += 1
+
+    while iys < len(ys):
+        ret.append(ys[iys])
+        iys += 1
+
+    while ixs < len(xs):
+        ret.append(xs[ixs])
+        ixs += 1
+    return ret
+
 
 def merge_sorted(xs, cmp=cmp_standard):
     '''
@@ -95,6 +116,15 @@ def merge_sorted(xs, cmp=cmp_standard):
     You should return a sorted version of the input list xs.
     You should not modify the input list xs in any way.
     '''
+    if len(xs) <= 1:
+        return xs
+    else:
+        mid = len(xs) // 2
+        left = xs[mid:]
+        right = xs[:mid]
+        left_sorted = merge_sorted(left, cmp=cmp)
+        right_sorted = merge_sorted(right, cmp=cmp)
+        return _merged(left_sorted, right_sorted, cmp=cmp)
 
 
 def quick_sorted(xs, cmp=cmp_standard):
@@ -102,7 +132,7 @@ def quick_sorted(xs, cmp=cmp_standard):
     Quicksort is like mergesort,
     but it uses a different strategy to split the list.
     Instead of splitting the list down the middle,
-    a "pivot" value is randomly selected, 
+    a "pivot" value is randomly selected,
     and the list is split into a "less than" sublist and a "greater than" sublist.
 
     The pseudocode is:
@@ -120,6 +150,17 @@ def quick_sorted(xs, cmp=cmp_standard):
     You should return a sorted version of the input list xs.
     You should not modify the input list xs in any way.
     '''
+    if len(xs) <= 1:
+        return xs
+    else:
+        mid = len(xs) // 2
+        pivot = xs[mid]
+        xs_lt = [x for x in xs if cmp(x, pivot) == -1]
+        xs_gt = [x for x in xs if cmp(x, pivot) == 1]
+        xs_eq = [x for x in xs if cmp(x, pivot) == 0]
+        xs_lt = quick_sorted(xs_lt, cmp=cmp)
+        xs_gt = quick_sorted(xs_gt, cmp=cmp)
+        return xs_lt + xs_eq + xs_gt
 
 
 def quick_sort(xs, cmp=cmp_standard):
